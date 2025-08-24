@@ -14,7 +14,7 @@ COPY . .
 COPY .env .env
 
 RUN pnpx prisma generate
-RUN pnpx prisma db push --force-reset
+RUN pnpx prisma db push 
 
 RUN pnpm run build
 
