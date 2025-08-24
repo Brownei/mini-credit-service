@@ -27,7 +27,7 @@ services:
       - DATABASE_URL=mysql://avnadmin:AVNS_3fngQLz1mS_N-s45Y-a@mini-credit2025-brownsonesiti-9294.b.aivencloud.com:15423/defaultdb?ssl-mode=REQUIRED
       - SECRET_KEY=thisismycodetoworkforeverthingandemcrytpyinanddexrytpyion
       - NODE_ENV=test
-    command: sh -c "pnpx prisma migrate deploy && pnpm run test"
+    command: sh -c "pnpm run test"
 
 secrets:
   db_password:
