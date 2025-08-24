@@ -10,8 +10,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=mysql://avnadmin:AVNS_3fngQLz1mS_N-s45Y-a@mini-credit2025-brownsonesiti-9294.b.aivencloud.com:15423/defaultdb?ssl-mode=REQUIRED
-      - SECRET_KEY=thisismycodetoworkforeverthingandemcrytpyinanddexrytpyion
+      - DATABASE_URL=mysql://avnadmin:$(cat /run/secrets/db_password)@mini-credit2025-brownsonesiti-9294.b.aivencloud.com:15423/defaultdb?ssl-mode=REQUIRED
+      - SECRET_KEY=/run/secrets/app_secret
+    secrets:
+      - db_password
+      - app_secret
 
   mini-credit-test:
     build:
@@ -21,10 +24,18 @@ services:
     networks:
       - mini-credit
     environment:
-      - DATABASE_URL=mysql://avnadmin:AVNS_3fngQLz1mS_N-s45Y-a@mini-credit2025-brownsonesiti-9294.b.aivencloud.com:15423/defaultdb?ssl-mode=REQUIRED
-      - SECRET_KEY=thisismycodetoworkforeverthingandemcrytpyinanddexrytpyion
+      - DATABASE_URL=mysql://avnadmin:$(cat /run/secrets/db_password)@mini-credit2025-brownsonesiti-9294.b.aivencloud.com:15423/defaultdb?ssl-mode=REQUIRED
+      - SECRET_KEY=/run/secrets/app_secret
       - NODE_ENV=test
     command: sh -c "pnpx prisma migrate deploy && pnpm run test"
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  db_root_password:
+    file: ./secrets/db_root_password.txt
+  app_secret:
+    file: ./secrets/app_secret.txt
 
 networks:
   mini-credit:

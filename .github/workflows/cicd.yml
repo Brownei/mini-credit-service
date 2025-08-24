@@ -22,6 +22,12 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
+      - name: Set up secrets
+        run: |
+           mkdir -p secrets
+            echo "${{ secrets.DB_SECRET }}" > secrets/db_password.txt
+            echo "${{ secrets.APP_SECRET }}" > secrets/app_secret.txt
+
       - name: Build and run tests
         run: |
           docker compose -f docker-compose.yml up --build --abort-on-container-exit mini-credit-test
