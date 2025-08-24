@@ -1,9 +1,8 @@
 import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CreateStatementDto } from './dto/create-statement.dto';
 import { PrismaService } from 'src/helpers/prisma.service';
-import { EncryptionService } from 'src/helpers/encryption.service';
-import { Decimal } from '../../generated/prisma/runtime/library';
-import { toArray } from 'rxjs';
+import { Decimal } from '@prisma/client/runtime/library';
+
 @Injectable()
 export class StatementsService {
   constructor(
