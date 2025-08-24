@@ -1,0 +1,52 @@
+version: '3'
+services:
+  mini-credit:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: mini-credit-api:latest
+    networks:
+        - mini-credit
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=mysql://db:db@localhost:3306/db
+      - SECRET_KEY=thisismycodetoworkforeverthingandemcrytpyinanddexrytpyion
+    depends_on:
+      - database
+
+  mini-credit-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mini-credit-api:test
+    networks:
+      - mini-credit
+    environment:
+      - DATABASE_URL=mysql://db:db@database:3306/db
+      - SECRET_KEY=thisismycodetoworkforeverthingandemcrytpyinanddexrytpyion
+      - NODE_ENV=test
+    depends_on:
+      database:
+        condition: service_healthy
+    command: sh -c "pnpx prisma migrate deploy && pnpm run test"
+
+  database:
+    image: mysql:8.0-oracle
+    networks:
+        - mini-credit
+    environment:
+      MYSQL_USER: db
+      MYSQL_ROOT_PASSWORD: db
+      MYSQL_PASSWORD: db
+      MYSQL_DB: db
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck: 
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "db", "-pdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  mini-credit:
+    driver: bridge

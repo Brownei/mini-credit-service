@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" //mysql
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  username         String          @unique
+  password      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  statements    Statement[]
+  transactions  Transaction[]
+  insights      Insight[]
+  bureauReports BureauReport[]
+  auditLogs     AuditLog[]
+}
+
+model Statement {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  period    String   
+  openingBalance Decimal @default(0.0)
+  closingBalance Decimal @default(0.0)
+  inflow Decimal @default(0.0)
+  outflow Decimal @default(0.0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  amount      Decimal  @db.Decimal(10, 2)
+  type        String   
+  description String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Insight {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  avgIncome Int
+    inflow Decimal @default(0.0)
+  outflow Decimal @default(0.0)
+  net Decimal @default(0.0)
+  riskFlags String
+  parsingSuccessRate Decimal @default(0.0)
+  createdAt DateTime @default(now())
+
+  buckets InsightBuckets[]
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model InsightBuckets {
+  id        Int      @id @default(autoincrement())
+  insightId Int
+  name String
+  price Decimal
+
+  insight Insight @relation(fields: [insightId], references: [id])
+}
+
+model BureauReport {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  score     Int      
+  report    String?  
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String   
+  metadata  String?  
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
