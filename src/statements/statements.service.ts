@@ -2,7 +2,7 @@ import { ConflictException, Injectable, InternalServerErrorException, Unauthoriz
 import { CreateStatementDto } from './dto/create-statement.dto';
 import { PrismaService } from 'src/helpers/prisma.service';
 import { EncryptionService } from 'src/helpers/encryption.service';
-import { Decimal } from 'generated/prisma/runtime/library';
+import { Decimal } from '../../generated/prisma/runtime/library';
 import { toArray } from 'rxjs';
 @Injectable()
 export class StatementsService {

@@ -1,5 +1,5 @@
 import { Injectable, Logger, LoggerService, NotFoundException } from '@nestjs/common';
-import { Decimal } from 'generated/prisma/runtime/library';
+import { Decimal } from '../../generated/prisma/runtime/library';
 import { PrismaService } from 'src/helpers/prisma.service';
 
 @Injectable()
