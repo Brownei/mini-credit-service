@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
@@ -13,68 +13,110 @@ export class AuthService {
   ) { }
 
   async login(loginDto: LoginDto) {
-    const existingUser = await this.dbService.user.findUnique({
-      where: { username: loginDto.username },
+    try {
+      const existingUser = await this.dbService.user.findUnique({
+        where: { username: loginDto.username },
 
-    });
+      });
 
-    if (!existingUser) {
-      throw new ForbiddenException('No user like this exists');
+      if (!existingUser) {
+        throw new ForbiddenException('No user like this exists');
+      }
+
+      const comparePassword = await bcrypt.compare(loginDto.password, existingUser.password)
+
+      if (comparePassword === true) {
+        const token = this.jwtService.sign(
+          { id: existingUser.id, role: existingUser.role },
+          {
+            expiresIn: '1d',
+          },
+        );
+
+        return {
+          message: 'Signin successful',
+          access_token: token,
+          user_data: existingUser.username,
+        }
+
+      }
+
+      throw new ConflictException("Incorrect password")
+
+    } catch (error) {
+      throw new InternalServerErrorException()
     }
+  }
 
-    const comparePassword = await bcrypt.compare(loginDto.password, existingUser.password)
+  async register(registerDto: RegisterDTO) {
+    try {
+      const oldUser = await this.dbService.user.findUnique({
+        where: { username: registerDto.username },
 
-    if (comparePassword === true) {
+      });
+
+      if (oldUser) {
+        throw new ForbiddenException('A user with this username already exists');
+      }
+
+      const hashedPassword = await bcrypt.hash(registerDto.password as string, 10);
+
+
+      const user = await this.dbService.user.create({
+        data: {
+          username: registerDto.username,
+          password: hashedPassword,
+          role: registerDto.role !== undefined ? registerDto.role : "user"
+        },
+      });
+
       const token = this.jwtService.sign(
-        { id: existingUser.id },
+        { id: user.id, role: user.role },
         {
           expiresIn: '1d',
         },
       );
 
       return {
-        message: 'Signin successful',
+        message: 'Signup successful',
         access_token: token,
-        user_data: existingUser.username,
+        user_data: user.username,
       }
 
+    } catch (error) {
+      throw new InternalServerErrorException()
     }
-
-    throw new ConflictException("Incorrect password")
   }
 
-  async register(registerDto: RegisterDTO) {
-    // const firstName = dto.fullName.split(' ')
-    const oldUser = await this.dbService.user.findUnique({
-      where: { username: registerDto.username },
+  async createAUser(registerDto: RegisterDTO) {
+    try {
+      const oldUser = await this.dbService.user.findUnique({
+        where: { username: registerDto.username },
 
-    });
+      });
 
-    if (oldUser) {
-      throw new ForbiddenException('A user with this username already exists');
-    }
+      if (oldUser) {
+        throw new ForbiddenException('A user with this username already exists');
+      }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password as string, 10);
+      const hashedPassword = await bcrypt.hash(registerDto.password as string, 10);
 
 
-    const user = await this.dbService.user.create({
-      data: {
-        username: registerDto.username,
-        password: hashedPassword,
-      },
-    });
+      await this.dbService.user.create({
+        data: {
+          username: registerDto.username,
+          password: hashedPassword,
+          role: "user"
+        },
+      });
 
-    const token = this.jwtService.sign(
-      { id: user.id },
-      {
-        expiresIn: '1d',
-      },
-    );
+      return {
+        message: 'User has been created',
+      }
 
-    return {
-      message: 'Signup successful',
-      access_token: token,
-      user_data: user.username,
+
+    } catch (error) {
+      throw new InternalServerErrorException()
     }
   }
 }

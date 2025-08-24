@@ -1,98 +1,167 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+Mini Credit Insights Service
+============================
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A lightweight backend service that ingests **bank statements (CSV)**, computes **income & spending insights**, and integrates with a **mock credit bureau API**.\
+All features are exposed via **secure REST APIs** with JWT authentication.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+* * * * *
 
-## Description
+🚀 Tech Stack
+-------------
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+-   **Node.js + TypeScript**
 
-## Project setup
+-   **Framework:** NestJS (Express/Fastify also possible)
 
-```bash
-$ pnpm install
-```
+-   **Database:** MySQL (Prisma)
 
-## Compile and run the project
+-   **Auth:** JWT-based authentication
 
-```bash
-# development
-$ pnpm run start
+-   **Docker Compose:** for local development with MySQL
 
-# watch mode
-$ pnpm run start:dev
+-   **Testing & CI:** Jest + GitHub Actions
 
-# production mode
-$ pnpm run start:prod
-```
+* * * * *
 
-## Run tests
+📂 Core Endpoints
+-----------------
 
-```bash
-# unit tests
-$ pnpm run test
+### 🔐 Authentication
 
-# e2e tests
-$ pnpm run test:e2e
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/auth/register` | User registration (only **admin** can create users). |
+| `POST` | `/auth/login` | JWT-based login. |
 
-# test coverage
-$ pnpm run test:cov
-```
+-   **Design choice:**\
+    Authentication ensures sensitive data (bank transactions, credit reports) is only accessed by verified users. Admins manage user creation.
 
-## Deployment
+* * * * *
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### 🧾 Statements
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/statements/upload` | Upload a **CSV bank statement** containing: `date`, `description`, `amount`, `balance`. |
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+-   **Design choice:**
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+    -   Each CSV is parsed into structured **transactions** linked to a **statement record**.
 
-## Resources
+    -   The bank statement creates a transaction automatically to indicate the transaction was done.
 
-Check out a few resources that may come in handy when working with NestJS:
+    -  There are terms used for the statement table like `closingBalance`, `openingBalance`, `inflow`, and `outflow` to simulate the statement for most banks which can help understand bank statements. With each transactions made through the route, it updates the statememt for the given date/period, e.g "2025-08"
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+* * * * *
 
-## Support
+### 📈 Insights
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/insights/run` | Compute insights: <br/> - 3-month average income <br/> - Inflow / Outflow / Net <br/> - Spend category buckets <br/> - Risk flags <br/> - Parsing success rate |
+| `GET` | `/insights/:id` | Retrieve previously computed insights. |
 
-## Stay in touch
+-   **Design choice:**
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+    -   Not enough time to be implemented properly.
 
-## License
+* * * * *
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 🏦 Credit Bureau Integration
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/bureau/check` | Calls the **mock bureau API** and persists normalized results. Retries/backoff on errors. |
+
+-   **Mock Bureau API Specs:**
+
+    -   Endpoint: `POST /v1/credit/check`
+
+    -   Headers: `X-API-KEY` required
+
+    -   Returns:
+
+        `{
+          "score": 680,
+          "risk_band": "medium",
+          "enquiries_6m": 2,
+          "defaults": 0,
+          "open_loans": 3,
+          "trade_lines": 5
+        }`
+
+    -   Error Handling: Retry with exponential backoff on `400`, `429`, and `5xx` errors.
+
+-   **Design choice:**
+
+    -   Bureau reports are **normalized** into a `bureau_reports` table.
+
+    -   Ensures consistency across different bureau providers.
+
+    -   Used for downstream risk modeling.
+
+* * * * *
+
+🗄️ Suggested Data Model
+------------------------
+
+| Table | Purpose |
+| --- | --- |
+| **Users** | Authentication & authorization. |
+| **Statements** | Uploaded CSV files. |
+| **Transactions** | Parsed transactions from statements. |
+| **Insights** | Computed insights per statement/user. |
+| **BureauReports** | Credit bureau results (normalized). |
+
+* * * * *
+
+🔍 Observability
+----------------
+
+-   **Structured logs** with request/response tracking.
+
+-   **Health check:** `/health` (includes DB checks).
+
+-   **Metrics:** `/metrics` endpoint (Prometheus-compatible).
+
+* * * * *
+
+🐳 Dockerized Development
+-------------------------
+
+`docker compose up --build`
+
+-   Spins up:
+
+    -   `mini-credit-api` (NestJS backend)
+
+    -   `mysql` (database)
+
+-   `.env` variables are automatically copied inside the container.
+
+* * * * *
+
+✅ Testing & CI
+--------------
+
+-   **Unit tests:** Jest
+
+-   GitHub Actions workflow runs:
+
+    1.  Build backend
+
+    2.  Run tests
+
+    3.  Verify Docker Compose startup
+
+* * * * *
+
+⚡ **Summary of Design Choices**
+
+-   JWT + role-based auth for security.
+
+-   Normalized DB schema to support extensibility.
+
+-   Insights designed for **financial decision-making** (income stability, spending patterns, risk factors).
+
+-   Fully containerized for one-command startup.

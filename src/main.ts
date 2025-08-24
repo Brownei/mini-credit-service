@@ -21,7 +21,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Mini Credit Insights Service')
-    .setDescription('This explains how mini data')
+    .setDescription('Mini Credit Insights Service is a backend microservice designed to analyze financial data and provide actionable insights for credit decisioning. It processes user transactions, statements, and bureau reports to generate metrics')
     .setVersion('v1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

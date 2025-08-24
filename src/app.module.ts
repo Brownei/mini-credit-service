@@ -8,6 +8,7 @@ import { BureauModule } from './bureau/bureau.module';
 import { JwtModule } from '@nestjs/jwt';
 import { HealthModule } from './health/health.module';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
