@@ -10,10 +10,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=mysql://db:db@localhost:3306/db
+      - DATABASE_URL=mysql://avnadmin:AVNS_3fngQLz1mS_N-s45Y-a@mini-credit2025-brownsonesiti-9294.b.aivencloud.com:15423/defaultdb?ssl-mode=REQUIRED
       - SECRET_KEY=thisismycodetoworkforeverthingandemcrytpyinanddexrytpyion
-    depends_on:
-      - database
 
   mini-credit-test:
     build:
@@ -23,29 +21,10 @@ services:
     networks:
       - mini-credit
     environment:
-      - DATABASE_URL=mysql://db:db@database:3306/db
+      - DATABASE_URL=mysql://avnadmin:AVNS_3fngQLz1mS_N-s45Y-a@mini-credit2025-brownsonesiti-9294.b.aivencloud.com:15423/defaultdb?ssl-mode=REQUIRED
       - SECRET_KEY=thisismycodetoworkforeverthingandemcrytpyinanddexrytpyion
       - NODE_ENV=test
-    depends_on:
-      database:
-        condition: service_healthy
     command: sh -c "pnpx prisma migrate deploy && pnpm run test"
-
-  database:
-    image: mysql:8.0-oracle
-    networks:
-        - mini-credit
-    environment:
-      MYSQL_USER: db
-      MYSQL_ROOT_PASSWORD: db
-      MYSQL_PASSWORD: db
-      MYSQL_DB: db
-    command: --default-authentication-plugin=mysql_native_password
-    healthcheck: 
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "db", "-pdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 networks:
   mini-credit:
