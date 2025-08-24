@@ -100,6 +100,10 @@ Finalized Data Model
     2.  Run tests
     3.  Verify Docker Compose startup
 
+:::warning
+Please do note, the `docker-compose.yml was configured for this project specifically to work as usual. So some configures may sound odd if used in other projects`
+:::
+
 * * * * *
 
  **Summary of Design Choices**
